@@ -2,7 +2,7 @@ name: trigger blog update
 
 on:
   issues:
-    types: [opened, closed, edited, milestoned, labeled, unlabeled, reopened, demilestoned]
+    types: [opened, closed, edited]
   issue_comment:
     types: [created]
 
@@ -10,11 +10,30 @@ jobs:
   trigger:
     runs-on: ubuntu-latest
     steps:
-    - name: Download Issue and Publish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-          curl -X POST https://api.github.com/repos/King-of-Infinite-Space/King-of-Infinite-Space.github.io/dispatches \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u ${{ secrets.ACCESS_TOKEN }} \
-          --data '{"event_type": "update", "client_payload": { "event_name": "'"$GITHUB_EVENT_NAME"'" }}'
+    - name: trigger update
+      uses: actions/github-script@v2
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const rq = await github.actions.listWorkflowRuns({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'main.yml'
+            })
+          const runs = rq.data
+          // console.log(runs)
+          const updateTimeStr = runs.workflow_runs[0].updated_at
+          const now = new Date()
+          const last = new Date(updateTimeStr)
+          const td = (now - last)/60000 // in minutes
+          if (td > 30) {
+            await github.repos.createDispatchEvent({
+              owner: context.repo.owner,
+              repo: King-of-Infinite-Space.github.io,
+              event_type: context.eventName
+            });
+            console.log('update triggered')
+          }
+          else {
+            console.log('update NOT triggered')
+          }
