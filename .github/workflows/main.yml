@@ -25,12 +25,12 @@ jobs:
             })
           const runs = rq.data
           // console.log(runs)
-          const updateTimeStr = runs.workflow_runs[0].updated_at
+          const updateTimeStr = runs.workflow_runs[1].updated_at // 0 is the current run
           const now = new Date()
           const last = new Date(updateTimeStr)
           const td = (now - last)/60000 // in minutes
           console.log(td)
-          if (td > 1) {
+          if (td > 30) {
             await github.repos.createDispatchEvent({
               owner: context.repo.owner,
               repo: 'King-of-Infinite-Space.github.io',
