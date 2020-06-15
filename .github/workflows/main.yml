@@ -1,6 +1,9 @@
 name: trigger blog update
 
 on:
+  push:
+    branches:
+      - master
   issues:
     types: [opened, closed, edited]
   issue_comment:
@@ -26,10 +29,11 @@ jobs:
           const now = new Date()
           const last = new Date(updateTimeStr)
           const td = (now - last)/60000 // in minutes
-          if (td > 30) {
+          console.log(td)
+          if (td > 1) {
             await github.repos.createDispatchEvent({
               owner: context.repo.owner,
-              repo: King-of-Infinite-Space.github.io,
+              repo: 'King-of-Infinite-Space.github.io',
               event_type: context.eventName
             });
             console.log('update triggered')
