@@ -45,12 +45,18 @@ jobs:
           return (td > 30)
           
     - name: trigger update
-      if: ${{steps.to-update.outputs.result}} == 'true'
+      if: ${{steps.to-update.outputs.result}}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
           echo "${{steps.to-update.outputs.result}}"
-          curl -X POST https://api.github.com/repos/King-of-Infinite-Space/King-of-Infinite-Space.github.io/dispatches \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u ${{ secrets.ACCESS_TOKEN }} \
-          --data '{"event_type": "'"$GITHUB_EVENT_NAME"'", "client_payload": { "event_name": "'"$GITHUB_EVENT_NAME"'" }}'
+          if ${{steps.to-update.outputs.result}}
+          then
+             curl -X POST https://api.github.com/repos/King-of-Infinite-Space/King-of-Infinite-Space.github.io/dispatches \
+            -H 'Accept: application/vnd.github.everest-preview+json' \
+            -u ${{ secrets.ACCESS_TOKEN }} \
+            --data '{"event_type": "'"$GITHUB_EVENT_NAME"'", "client_payload": { "event_name": "'"$GITHUB_EVENT_NAME"'" }}'
+          else
+             echo "not dispatching"
+          fi
+          
