@@ -13,7 +13,8 @@ jobs:
   trigger:
     runs-on: ubuntu-latest
     steps:
-    - name: trigger update
+    - name: check update
+      id: to-update
       uses: actions/github-script@v2
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
@@ -31,13 +32,24 @@ jobs:
           const td = (now - last)/60000 // in minutes
           console.log(td)
           if (td > 30) {
-            await github.repos.createDispatchEvent({
+            /* await github.repos.createDispatchEvent({
               owner: context.repo.owner,
               repo: 'King-of-Infinite-Space.github.io',
               event_type: context.eventName
-            });
+            }); */
             console.log('update triggered')
           }
           else {
             console.log('update NOT triggered')
           }
+          return (td > 30)
+          
+    - name: trigger update
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+          curl -X POST https://api.github.com/repos/King-of-Infinite-Space/King-of-Infinite-Space.github.io/dispatches \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -u ${{ secrets.ACCESS_TOKEN }} \
+          --data '{"event_type": "'"$GITHUB_EVENT_NAME"'", "client_payload": { "event_name": "'"$GITHUB_EVENT_NAME"'" }}'
+      if: ${{steps.to-update.outputs.result}}
