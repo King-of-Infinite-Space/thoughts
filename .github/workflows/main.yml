@@ -45,6 +45,7 @@ jobs:
           return (td > 30)
           
     - name: trigger update
+      if: ${{steps.to-update.outputs.result}}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
@@ -52,4 +53,3 @@ jobs:
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           --data '{"event_type": "'"$GITHUB_EVENT_NAME"'", "client_payload": { "event_name": "'"$GITHUB_EVENT_NAME"'" }}'
-      if: ${{steps.to-update.outputs.result}}
