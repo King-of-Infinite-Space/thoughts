@@ -43,10 +43,9 @@ jobs:
             console.log('update NOT triggered')
           }
           return (td > 30)
-        result-encoding: boolean
           
     - name: trigger update
-      if: ${{steps.to-update.outputs.result}}
+      if: ${{steps.to-update.outputs.result}} == 'true'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
