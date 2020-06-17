@@ -49,6 +49,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+          echo "${{steps.to-update.outputs.result}}"
           curl -X POST https://api.github.com/repos/King-of-Infinite-Space/King-of-Infinite-Space.github.io/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
