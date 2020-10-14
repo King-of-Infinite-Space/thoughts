@@ -1,13 +1,10 @@
 name: trigger blog update
 
 on:
-  push:
-    branches:
-      - master
   issues:
     types: [opened, closed, edited]
-  issue_comment:
-    types: [created]
+  schedule:
+    - cron: '0 0 * * 2'
 
 jobs:
   trigger:
