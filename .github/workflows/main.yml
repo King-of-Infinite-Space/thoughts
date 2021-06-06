@@ -4,7 +4,7 @@ on:
   issues:
     types: [opened, closed, edited]
   schedule:
-    - cron: '0 0 * * 2'
+    - cron: '0 6 1,15 * *'
 
 jobs:
   trigger:
@@ -50,6 +50,11 @@ jobs:
           if ${{steps.to-update.outputs.result}}
           then
              curl -X POST https://api.github.com/repos/King-of-Infinite-Space/King-of-Infinite-Space.github.io/dispatches \
+            -H 'Accept: application/vnd.github.everest-preview+json' \
+            -u ${{ secrets.ACCESS_TOKEN }} \
+            --data '{"event_type": "'"$GITHUB_EVENT_NAME"'", "client_payload": { "event_name": "'"$GITHUB_EVENT_NAME"'" }}'
+            
+             curl -X POST https://api.github.com/repos/King-of-Infinite-Space/King-of-Infinite-Space/dispatches \
             -H 'Accept: application/vnd.github.everest-preview+json' \
             -u ${{ secrets.ACCESS_TOKEN }} \
             --data '{"event_type": "'"$GITHUB_EVENT_NAME"'", "client_payload": { "event_name": "'"$GITHUB_EVENT_NAME"'" }}'
