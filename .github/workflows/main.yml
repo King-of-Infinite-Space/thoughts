@@ -8,14 +8,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  trigger:
+  trigger-update:
     runs-on: ubuntu-latest
     steps:
-    - name: check update
-      id: to-update
-      uses: actions/github-script@v2
+    - name: check and trigger update
+      uses: actions/github-script@v4
       with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
+        github-token: ${{secrets.PERSONAL_ACCESS_TOKEN}}
+        # GITHUB_TOKEN used by default is scoped to the current repository
         script: |
           const rq = await github.actions.listWorkflowRuns({
             owner: context.repo.owner,
@@ -23,43 +23,21 @@ jobs:
             workflow_id: 'main.yml'
             })
           const runs = rq.data
-          // console.log(runs)
           const updateTimeStr = runs.workflow_runs[1].updated_at // 0 is the current run
           const now = new Date()
           const last = new Date(updateTimeStr)
-          const td = (now - last)/60000 // in minutes
-          console.log(td)
+          const td = (now - last) / 60000
+          console.log(`last updated ${td} minutes ago`)
           if (td > 30) {
-            /* await github.repos.createDispatchEvent({
-              owner: context.repo.owner,
-              repo: 'King-of-Infinite-Space.github.io',
-              event_type: context.eventName
-            }); */
+            for (const targetRepo of ['King-of-Infinite-Space.github.io', 'King-of-Infinite-Space']){
+              await github.repos.createDispatchEvent({
+                owner: context.repo.owner,
+                repo: targetRepo,
+                event_type: context.eventName
+              }); 
+            }
             console.log('update triggered')
           }
           else {
             console.log('update NOT triggered')
           }
-          return (td > 30)
-          
-    - name: trigger update
-      if: ${{steps.to-update.outputs.result}}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-          echo "${{steps.to-update.outputs.result}}"
-          if ${{steps.to-update.outputs.result}}
-          then
-             curl -X POST https://api.github.com/repos/King-of-Infinite-Space/King-of-Infinite-Space.github.io/dispatches \
-            -H 'Accept: application/vnd.github.everest-preview+json' \
-            -u $GITHUB_TOKEN \
-            --data '{"event_type": "'"$GITHUB_EVENT_NAME"'", "client_payload": { "event_name": "'"$GITHUB_EVENT_NAME"'" }}'
-            
-             curl -X POST https://api.github.com/repos/King-of-Infinite-Space/King-of-Infinite-Space/dispatches \
-            -H 'Accept: application/vnd.github.everest-preview+json' \
-            -u $GITHUB_TOKEN \
-            --data '{"event_type": "'"$GITHUB_EVENT_NAME"'", "client_payload": { "event_name": "'"$GITHUB_EVENT_NAME"'" }}'
-          else
-             echo "not dispatching"
-          fi
-          
