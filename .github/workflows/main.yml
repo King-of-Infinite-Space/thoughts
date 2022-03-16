@@ -3,8 +3,6 @@ name: trigger blog update
 on:
   issues:
     types: [opened, edited]
-  schedule:
-    - cron: '0 6 1,15 * *'
   workflow_dispatch:
 
 jobs:
