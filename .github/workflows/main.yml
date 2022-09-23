@@ -1,41 +1,41 @@
 name: trigger blog update
 
 on:
-  issues:
-    types: [opened, edited]
+  discussion:
+    types: [created, edited]
   workflow_dispatch:
 
 jobs:
   trigger-update:
     runs-on: ubuntu-latest
     steps:
-    - name: check and trigger update
-      uses: actions/github-script@v4
-      with:
-        github-token: ${{secrets.PERSONAL_ACCESS_TOKEN}}
-        # GITHUB_TOKEN used by default is scoped to the current repository
-        script: |
-          const rq = await github.actions.listWorkflowRuns({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            workflow_id: 'main.yml'
-            })
-          const runs = rq.data
-          const updateTimeStr = runs.workflow_runs[1].updated_at // 0 is the current run
-          const now = new Date()
-          const last = new Date(updateTimeStr)
-          const td = (now - last) / 60000
-          console.log(`last updated ${td} minutes ago`)
-          if (td > 30) {
-            for (const targetRepo of ['King-of-Infinite-Space.github.io', 'King-of-Infinite-Space']){
-              await github.repos.createDispatchEvent({
-                owner: context.repo.owner,
-                repo: targetRepo,
-                event_type: context.eventName
-              }); 
+      - name: check and trigger update
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{secrets.PERSONAL_ACCESS_TOKEN}}
+          # GITHUB_TOKEN used by default is scoped to the current repository
+          script: |
+            const rq = await github.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'main.yml'
+              })
+            const runs = rq.data
+            const updateTimeStr = runs.workflow_runs[1].updated_at // 0 is the current run
+            const now = new Date()
+            const last = new Date(updateTimeStr)
+            const td = (now - last) / 60000
+            console.log(`last updated ${td} minutes ago`)
+            if (td > 30) {
+              for (const targetRepo of ['King-of-Infinite-Space.github.io']){
+                await github.repos.createDispatchEvent({
+                  owner: context.repo.owner,
+                  repo: targetRepo,
+                  event_type: context.eventName
+                }); 
+              }
+              console.log('update triggered')
             }
-            console.log('update triggered')
-          }
-          else {
-            console.log('update NOT triggered')
-          }
+            else {
+              console.log('update NOT triggered')
+            }
