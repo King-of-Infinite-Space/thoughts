@@ -1,12 +1,35 @@
-name: trigger blog update
+name: update blog
 
 on:
   discussion:
-    types: [created, edited]
+    types: [created, edited, deleted]
   workflow_dispatch:
 
 jobs:
+  discussion-to-md:
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: "~1.25"
+
+      - uses: actions/checkout@v3
+        with:
+          path: "mainRepo"
+
+      - uses: actions/checkout@v3
+        with:
+          repository: "king-of-infinite-space/gh-discussions-export"
+          path: "toolRepo"
+
+      - run: |
+          cd mainRepo
+          deno run --allow-net --allow-env --allow-read --allow-write ../toolRepo/scripts/fetchPosts.js && ../toolRepo/scripts/commit.bash
+
   trigger-update:
+    needs: discussion-to-md
     runs-on: ubuntu-latest
     steps:
       - name: check and trigger update
@@ -27,7 +50,7 @@ jobs:
             const td = (now - last) / 60000
             console.log(`last updated ${td} minutes ago`)
             if (td > 30) {
-              for (const targetRepo of ['King-of-Infinite-Space.github.io']){
+              for (const targetRepo of ['King-of-Infinite-Space']){
                 await github.repos.createDispatchEvent({
                   owner: context.repo.owner,
                   repo: targetRepo,
