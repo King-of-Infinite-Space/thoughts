@@ -1,3 +1,3 @@
-[Content source](https://github.com/King-of-Infinite-Space/thoughts/discussions?discussions_q=sort%3Aupdated) of blog [king-of-infinite-space.github.io](https://king-of-infinite-space.github.io)
+[Content source](https://github.com/King-of-Infinite-Space/thoughts/discussions?discussions_q=sort%3Aupdated) of [blog.lnfinite.space](https://blog.lnfinite.space)
 
-Subscribe to blog posts: [king-of-infinite-space.github.io/feed.atom](https://king-of-infinite-space.github.io/feed.atom)
+Subscribe to blog posts: [blog.lnfinite.space/feed.rss](https://blog.lnfinite.space/feed.rss)
