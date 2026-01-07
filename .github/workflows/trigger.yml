@@ -26,7 +26,7 @@ jobs:
       - uses: gautamkrishnar/blog-post-workflow@v1
         with:
           feed_list: "https://blog.lnfinite.space/feed"
-          max_post_count: 3
+          max_post_count: 4
           template: "$newline- [$title]($url) ($date)"
           date_format: yyyy-mm
           enable_keepalive: false
